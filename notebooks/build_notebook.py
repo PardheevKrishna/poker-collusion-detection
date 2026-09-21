@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = Path(__file__).resolve().parent / "from_poker_actions_to_suspicious_pair_evidence.ipynb"
+RAW_SOURCE = (ROOT / "src" / "poker_coordination" / "raw_pipeline.py").read_text(encoding="utf-8")
 
 
 def md(source: str, attachments: dict | None = None) -> dict:
@@ -28,6 +29,7 @@ def build() -> None:
             "image/jpeg": base64.b64encode(cover.read_bytes()).decode("ascii")
         }
     }
+    raw_source = RAW_SOURCE
     cells = [
         md(
             """
@@ -270,6 +272,33 @@ def build() -> None:
         ),
         md(
             """
+            ### Complete raw-data refit: features, training, inference
+
+            The next code cell is the complete compact clean-room implementation, copied from `src/poker_coordination/raw_pipeline.py` in the public repository. It reads only observable `hands`, `seats`, `actions`, and released development labels/evidence. It constructs one row per pair-hand, aggregates symmetric pair features, fits risk/behavior/event models, ranks five evidence hands, and returns a submission dataframe. Player identifiers are used only for joins and connected-pool boundaries; they are not model inputs.
+
+            Set `RUN_REFERENCE_REFIT = True` below when the raw competition data is mounted. The default is `False` so the notebook runs quickly in artifact-only mode. The fresh compact refit is a transparent reference implementation; byte-identical selected files are produced by the exact replay section below because the historical run also used large cached cross-fitting and ranking artifacts.
+            """
+        ),
+        code(raw_source),
+        code(
+            """
+            RUN_REFERENCE_REFIT = False
+            if RUN_REFERENCE_REFIT:
+                if data_root is None:
+                    raise FileNotFoundError(
+                        'Mount the competition raw data (or place it in ../data) before enabling the fresh refit.'
+                    )
+                fresh = run_reference_refit(data_root)
+                fresh_path = Path('/kaggle/working' if Path('/kaggle/working').exists() else 'outputs') / 'reference_fresh_submission.csv'
+                write_submission(fresh, fresh_path)
+                print('Fresh reference submission:', fresh_path, fresh.shape)
+                display(fresh.head())
+            else:
+                print('Fresh raw refit is disabled. Set RUN_REFERENCE_REFIT=True after mounting raw competition data.')
+            """
+        ),
+        md(
+            """
             ### Architecture view
 
             The important invariant is that all signals flow from observable poker activity to pair-level review outputs. The exact v53/v51 replay does not silently substitute a fresh model or hidden data.
@@ -300,7 +329,7 @@ def build() -> None:
             """
             ## Exact selected-file generation
 
-            This is the authoritative reproduction route. It applies compact, deterministic patches to a frozen v50 base, preserves CSV row order and untouched columns, and writes both selected entries. No third-party package is needed for this section.
+            This is the authoritative reproduction route and the notebook's required output contract. One run writes `/kaggle/working/submission_v51.csv` and `/kaggle/working/submission_v53.csv` (or `outputs/` outside Kaggle), preserves CSV row order and untouched columns, and checks both selected SHA-256 values. It applies compact, deterministic patches to a frozen v50 base; no third-party package is needed for this section.
             """
         ),
         code(
@@ -367,6 +396,9 @@ def build() -> None:
 
             outputs = {version: make_selected(version) for version in ('v51','v53')}
             print({version: {'path': str(path), 'changed_rows': changed, 'sha256': digest(path)} for version, (path, changed) in outputs.items()})
+            assert Path(outputs['v51'][0]).name == 'submission_v51.csv'
+            assert Path(outputs['v53'][0]).name == 'submission_v53.csv'
+            print('Required selected files created:', [str(outputs[v][0]) for v in ('v51', 'v53')])
             """
         ),
         code(

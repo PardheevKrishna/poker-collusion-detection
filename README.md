@@ -47,12 +47,14 @@ Linux and macOS users can run:
 
 The historical research path generated about 19 GB of intermediate arrays during feature extraction, cross-fitting, equity simulation, and ranking. Those caches are derived data rather than required source material. The selected CSVs are reproduced from a frozen v50 base and two sparse deterministic deltas, while the notebook and `historical_pipeline/` expose the training and inference design that produced those artifacts. This distinction is stated directly so reviewers can separate exact artifact reproduction from a fresh model refit.
 
+For a fresh compact refit from raw competition tables, run `run_reference_refit` from [`src/poker_coordination/raw_pipeline.py`](src/poker_coordination/raw_pipeline.py) after placing the raw files in `../data` (or mounting them in a notebook). It performs feature generation, weak evidence labeling, pair risk/behavior training, hand evidence scoring, stable top-five selection, and CSV validation. The notebook leaves `RUN_REFERENCE_REFIT = False` by default so exact artifact replay remains fast and deterministic; setting it to `True` runs the full raw-to-submission path.
+
 ## Repository map
 
 | Path | Purpose |
 |---|---|
 | `artifacts/` | Frozen v50 base, sparse v51/v53 deltas, and hash manifest |
-| `src/poker_coordination/` | Reproduction, validation, modeling, and evidence utilities |
+| `src/poker_coordination/` | Reproduction, validation, complete raw feature/training/inference path, and evidence utilities |
 | `historical_pipeline/` | Curated production source and frozen configuration records |
 | `notebooks/` | Public Kaggle notebook source |
 | `docs/` | Data card, model card, compliance notes, and case reviews |
@@ -72,4 +74,3 @@ Validation holds out connected player pools and tests shortened and chronologica
 - Code is MIT licensed. Competition-derived artifacts remain subject to the competition rules described in the data card.
 
 See [`docs/COMPETITION_COMPLIANCE.md`](docs/COMPETITION_COMPLIANCE.md) for the verification checklist and [`docs/CASE_REVIEWS.md`](docs/CASE_REVIEWS.md) for the five required reviews.
-

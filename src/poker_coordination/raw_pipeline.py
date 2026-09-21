@@ -136,8 +136,15 @@ def build_pair_hand_features(data_root: str | Path, pairs: pd.DataFrame, max_pai
     shared = shared.join(key_right.rename({"player_id": "right_player_id"}), on=["pair_id", "hand_id"], how="left")
     shared = shared.join(left_action, on=["hand_id", "left_player_id"], how="left")
     shared = shared.join(right_action, on=["hand_id", "right_player_id"], how="left")
-    numeric = [c for c in shared.collect_schema().names() if c.startswith(("left_", "right_"))]
-    result = shared.with_columns([pl.col(c).fill_null(0) for c in numeric]).with_columns(
+    numeric = [c for c in shared.collect_schema().names()
+               if c.startswith(("left_", "right_"))
+               and c not in ("left_player_id", "right_player_id")]
+    # The competition seat table stores folded/showdown flags as booleans,
+    # while action aggregates are integers. Cast the gameplay values before
+    # filling nulls so Polars versions agree on the expression dtype.
+    result = shared.with_columns([
+        pl.col(c).cast(pl.Float64).fill_null(0.0).alias(c) for c in numeric
+    ]).with_columns(
         [
             (pl.col("left_net_chips").abs() + pl.col("right_net_chips").abs()).alias("transfer_denominator"),
             ((pl.col("left_net_chips") - pl.col("right_net_chips")).abs() /

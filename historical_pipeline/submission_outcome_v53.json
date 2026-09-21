@@ -1,0 +1,45 @@
+{
+  "recorded_at_utc": "2026-09-20T11:07:53.901663+00:00",
+  "official_snapshot_at": "2026-09-20T11:06:02.935158+00:00",
+  "submission": {
+    "ref": 56391641,
+    "totalBytes": 15144626,
+    "date": "2026-09-20T11:03:41.670Z",
+    "description": "v53: precise depth3 soft MAP, fixed25pct evidence blend; risks unchanged",
+    "fileName": "submission_v53_low_capacity_soft_map.csv",
+    "publicScore": "0.93894",
+    "status": "COMPLETE",
+    "submittedBy": "pardheev",
+    "submittedByRef": "pardheev",
+    "teamName": "Pardheev Krishna",
+    "url": "/submissions/56391641/56391641.raw"
+  },
+  "candidate_sha256": "3991740457962e77d38a43859d00e2c31dbbbbd3a01d06946ff99f10d98fadd4",
+  "public_gain_displayed": 0.00018,
+  "remaining": 2,
+  "public_rank": 3,
+  "gap_to_second": 0.00077,
+  "gap_to_first": 0.00174,
+  "private_rank_confirmed": false,
+  "final_selected_ids": [
+    56354264,
+    56391641
+  ],
+  "retained_best_promoted": true,
+  "retained_best_file": "submission.csv",
+  "production_review_sha256": "7c75c15c59f34b3eccc1e101c5acdbaa5c529fcba630b5e552ad76b599f4d547",
+  "original_screen_passed": false,
+  "exploratory_probe_eligible": false,
+  "exception_authorized": true,
+  "exception_decision_sha256": "020da0699e72e2479b4061f67409589bc4986877e24cb369b0811973db024214",
+  "new_production_fits": 3,
+  "evidence_map5_public": 0.736,
+  "evidence_map5_rounding_interval": [
+    0.73595,
+    0.73605
+  ],
+  "selection_reason": "V53 is the verified new public best with original v50 risks; retain v51 as the previously selected alternative with v50 evidence and different risk scores. Public gain does not establish private superiority.",
+  "second_place_achieved": false,
+  "first_place_achieved": false,
+  "no_additional_upload_in_this_record": true
+}

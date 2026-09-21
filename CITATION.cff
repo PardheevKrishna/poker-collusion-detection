@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If this solution package is useful, please cite it using this metadata."
+title: "From Poker Actions to Suspicious Pair Evidence"
+type: software
+authors:
+  - family-names: Krishna
+    given-names: Pardheev
+year: 2026
+license: MIT
+repository-code: "https://github.com/pardheev/poker-collusion-detection"
+keywords:
+  - poker
+  - coordination detection
+  - evidence retrieval
+  - ranking
+  - reproducibility
+

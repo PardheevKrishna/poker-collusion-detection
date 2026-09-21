@@ -1,0 +1,38 @@
+{
+  "status": "built",
+  "base": {
+    "path": "submission_v50_soft_top5_consensus.csv",
+    "sha256": "b6196e8d05e445a1ab1f8abcbb77b9d8324a3dd7bd3678b243011b7efcf2952a"
+  },
+  "patches": {
+    "v53_evidence_patch.csv": {
+      "rows": 230,
+      "sha256": "7aa09aa9b9fbc7da904f7f05a809aa7478d319736d2c1f0b14d99eed48c235ce"
+    },
+    "v51_risk_patch.csv": {
+      "rows": 1486,
+      "sha256": "914a39f72217e7180795f7b4aa0765112cf44451cc49ff73657fe8528f8dd799"
+    }
+  },
+  "selected_outputs": {
+    "v51": {
+      "submission_id": 56354264,
+      "sha256": "c8b0f4c260f7766366ab2060bdc91849d24f0bd44d9dcf35c63c02fff582e370"
+    },
+    "v53": {
+      "submission_id": 56391641,
+      "sha256": "3991740457962e77d38a43859d00e2c31dbbbbd3a01d06946ff99f10d98fadd4"
+    }
+  },
+  "schema": [
+    "pair_id",
+    "risk_score",
+    "predicted_behavior",
+    "evidence_hand_1",
+    "evidence_hand_2",
+    "evidence_hand_3",
+    "evidence_hand_4",
+    "evidence_hand_5"
+  ],
+  "scope": "Exact deterministic replay of the selected CSV artifacts; no labels, private leaderboard data, IDs-as-features, row-order features, or generator internals are used."
+}

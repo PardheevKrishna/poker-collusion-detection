@@ -1,0 +1,13 @@
+{
+  "id": "pardheev/from-poker-actions-to-suspicious-pair-evidence",
+  "title": "From Poker Actions to Suspicious Pair Evidence",
+  "code_file": "from_poker_actions_to_suspicious_pair_evidence.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": false,
+  "enable_gpu": false,
+  "enable_internet": false,
+  "dataset_sources": [
+    "pardheev/poker-selected-submission-reproduction"
+  ]
+}

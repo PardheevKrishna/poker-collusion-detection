@@ -1,0 +1,8 @@
+# Exact selected-file replay uses only the Python standard library.
+# The notebook's optional analysis and reference refit use Kaggle's base image:
+pandas>=2.2,<4
+numpy>=2.0,<3
+matplotlib>=3.9,<4
+scikit-learn>=1.5,<2
+pyarrow>=17,<25
+

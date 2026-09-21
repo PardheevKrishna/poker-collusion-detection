@@ -1,0 +1,210 @@
+{
+  "base": "submissions\\submission_v50_soft_top5_consensus.csv",
+  "base_sha256": "b6196e8d05e445a1ab1f8abcbb77b9d8324a3dd7bd3678b243011b7efcf2952a",
+  "output": "submissions\\submission_v51_consensus_risk_hedge.csv",
+  "sha256": "c8b0f4c260f7766366ab2060bdc91849d24f0bd44d9dcf35c63c02fff582e370",
+  "submitted": true,
+  "created_at_utc": "2026-09-19T09:00:32.726709+00:00",
+  "kind": "exact_consensus_evidence_with_existing_anomaly_risk_hedge",
+  "component_sources": {
+    "all_nonrisk_columns": {
+      "file": "submissions\\submission_v50_soft_top5_consensus.csv",
+      "sha256": "b6196e8d05e445a1ab1f8abcbb77b9d8324a3dd7bd3678b243011b7efcf2952a",
+      "submission_id": 56354034,
+      "public_score": 0.93876,
+      "receipt": "submissions\\submission_v50_soft_top5_consensus.receipt.json",
+      "receipt_sha256": "10845dfd7684339e6a64d4fccb793bb0445bfc0b879772c1911ef99877fa7809",
+      "upload_intent": "submissions\\submission_v50_soft_top5_consensus.upload_intent.json",
+      "upload_intent_sha256": "a52c5caa442c8f2c1c4d3a09434b5fa21f121878a45d6260cef0aacc7e5e2fea"
+    },
+    "risk_score": {
+      "file": "submissions\\submission_v47_anomaly_hedge_v39.csv",
+      "sha256": "60ab6bb2b6c0308f5d450e909e37d50a576aae40c0390186a8208c3d0db1405d",
+      "submission_id": 56353453,
+      "public_score": 0.93827,
+      "receipt": "submissions\\submission_v47_anomaly_hedge_v39.receipt.json",
+      "receipt_sha256": "f8367e6e57c97e59d17b75981be73a4ffa8dd43ba93d4d49335dbc4e303714f4",
+      "upload_intent": "submissions\\submission_v47_anomaly_hedge_v39.upload_intent.json",
+      "upload_intent_sha256": "522d3b3c358dd8cbe55177f20a95f4bd61ff42506d702079f623032900158887"
+    }
+  },
+  "construction": "Copy v50 unchanged, then replace only risk_score with exact string values from submitted v47; no recomputation or blending.",
+  "pair_order_identical_to_both_sources": true,
+  "changed_risk_rows": 1486,
+  "changed_behavior_rows": 0,
+  "changed_evidence_rows": 0,
+  "behavior_and_evidence_identical_to_v50": true,
+  "risk_scores_identical_to_v47": true,
+  "validation": "models\\day13_review\\existing_variants_audit.json",
+  "risk_validation_sha256": "5819337f1ce04ff1d9bdbf3317e7e080081bdcea26c3c58e6fcf0079ca417a5c",
+  "risk_tradeoffs_normal_weight_25": [
+    {
+      "held": 0,
+      "omitted_behavior": "none",
+      "scope": "all",
+      "view": 0,
+      "normal_weight": 25,
+      "pair_ap_gain": 0.0,
+      "pair_behavior_weighted_gain": 0.0,
+      "paired_pool_gain_95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "held": 0,
+      "omitted_behavior": "none",
+      "scope": "all",
+      "view": 1,
+      "normal_weight": 25,
+      "pair_ap_gain": -0.00014003885339208821,
+      "pair_behavior_weighted_gain": -9.802719737446175e-05,
+      "paired_pool_gain_95": [
+        -0.0003755366945331851,
+        0.0
+      ]
+    },
+    {
+      "held": 0,
+      "omitted_behavior": "none",
+      "scope": "all",
+      "view": 2,
+      "normal_weight": 25,
+      "pair_ap_gain": -0.0002083735062966552,
+      "pair_behavior_weighted_gain": -0.00014587828528436208,
+      "paired_pool_gain_95": [
+        -0.0009428440972382045,
+        0.0
+      ]
+    },
+    {
+      "held": 1,
+      "omitted_behavior": "directed_transfer",
+      "scope": "held_vs_normal",
+      "view": 0,
+      "normal_weight": 25,
+      "pair_ap_gain": 0.0010088540760959663,
+      "pair_behavior_weighted_gain": null,
+      "paired_pool_gain_95": [
+        -0.005638912007552152,
+        0.010112295358040892
+      ]
+    },
+    {
+      "held": 1,
+      "omitted_behavior": "directed_transfer",
+      "scope": "held_vs_normal",
+      "view": 1,
+      "normal_weight": 25,
+      "pair_ap_gain": -0.0067580929613033636,
+      "pair_behavior_weighted_gain": null,
+      "paired_pool_gain_95": [
+        -0.024966222541102878,
+        0.0052694192148616805
+      ]
+    },
+    {
+      "held": 1,
+      "omitted_behavior": "directed_transfer",
+      "scope": "held_vs_normal",
+      "view": 2,
+      "normal_weight": 25,
+      "pair_ap_gain": -0.00014740501351073743,
+      "pair_behavior_weighted_gain": null,
+      "paired_pool_gain_95": [
+        -0.01219003397128999,
+        0.008372999172826023
+      ]
+    },
+    {
+      "held": 2,
+      "omitted_behavior": "soft_play",
+      "scope": "held_vs_normal",
+      "view": 0,
+      "normal_weight": 25,
+      "pair_ap_gain": 0.2095783253126847,
+      "pair_behavior_weighted_gain": null,
+      "paired_pool_gain_95": [
+        0.08910860434209904,
+        0.6737752676743259
+      ]
+    },
+    {
+      "held": 2,
+      "omitted_behavior": "soft_play",
+      "scope": "held_vs_normal",
+      "view": 1,
+      "normal_weight": 25,
+      "pair_ap_gain": 0.15206174644169465,
+      "pair_behavior_weighted_gain": null,
+      "paired_pool_gain_95": [
+        0.06947445364129969,
+        0.46560936226729077
+      ]
+    },
+    {
+      "held": 2,
+      "omitted_behavior": "soft_play",
+      "scope": "held_vs_normal",
+      "view": 2,
+      "normal_weight": 25,
+      "pair_ap_gain": 0.1483917185199137,
+      "pair_behavior_weighted_gain": null,
+      "paired_pool_gain_95": [
+        0.05920593227808543,
+        0.3812035155557369
+      ]
+    },
+    {
+      "held": 3,
+      "omitted_behavior": "coordinated_isolation",
+      "scope": "held_vs_normal",
+      "view": 0,
+      "normal_weight": 25,
+      "pair_ap_gain": -1.4144959810002966e-05,
+      "pair_behavior_weighted_gain": null,
+      "paired_pool_gain_95": [
+        -8.341939063629955e-05,
+        0.0
+      ]
+    },
+    {
+      "held": 3,
+      "omitted_behavior": "coordinated_isolation",
+      "scope": "held_vs_normal",
+      "view": 1,
+      "normal_weight": 25,
+      "pair_ap_gain": -0.0007162647555792878,
+      "pair_behavior_weighted_gain": null,
+      "paired_pool_gain_95": [
+        -0.0029694572640196286,
+        0.0
+      ]
+    },
+    {
+      "held": 3,
+      "omitted_behavior": "coordinated_isolation",
+      "scope": "held_vs_normal",
+      "view": 2,
+      "normal_weight": 25,
+      "pair_ap_gain": -0.002112170255866075,
+      "pair_behavior_weighted_gain": null,
+      "paired_pool_gain_95": [
+        -0.01061228208259631,
+        0.0
+      ]
+    }
+  ],
+  "risk_across_setting_generalization_gate_passed": false,
+  "candidate_role": "Unsubmitted fallback experiment combining the public-best evidence ordering with a previously tested alternative risk ranking. Not an automatic replacement for the primary.",
+  "separate_component_public_scores": {
+    "v50": 0.93876,
+    "v47": 0.93827,
+    "v39": 0.93827
+  },
+  "limitations": "The risk component tied v39 at displayed public precision. Its omitted-soft-play detection gains do not evaluate the hidden fourth behavior; known and other omitted-behavior shortened-history settings regress. The power 1.6 transformation is not probability calibration. Combined public/private improvement and private rank are unknown.",
+  "submission_id": 56354264,
+  "public_score": 0.93876,
+  "status": "scored; not promoted",
+  "private_improvement_confirmed": false
+}

@@ -1,0 +1,32 @@
+{
+  "base": "submissions\\submission_v39_conservative_known_fusion.csv",
+  "base_sha256": "35c992d1ae62b396e332fab780b111bfc13ef6fda72c9a0e701fbf2f790dce87",
+  "output": "submissions\\submission_v50_soft_top5_consensus.csv",
+  "sha256": "b6196e8d05e445a1ab1f8abcbb77b9d8324a3dd7bd3678b243011b7efcf2952a",
+  "submitted": true,
+  "kind": "soft_play_top5_membership_preserving_consensus",
+  "recipe": "shared_soft_top5_consensus",
+  "family": "soft_play",
+  "new_model_weight": 0.25,
+  "eligible_pairs": 660,
+  "baseline_top_five_reproduced_pairs": 660,
+  "changed_evidence_rows": 193,
+  "risk_and_behavior_preserved": true,
+  "model_sha256": "041ba6d6cc338bd909cc453283b306d820cf4349f2f0d1a0490f3a87c9e04963",
+  "validation": "models\\day14_soft_top5_consensus\\validation_shared_soft_top5_consensus_rep_0.json",
+  "validation_sha256": "dea09ca6e8b9f20f196884fa796a06de4b833ea86d70c810a5568110f6ce7312",
+  "limitations": "Corrected five-view means positive and three nonnegative full pool folds; full 95 percent interval includes zero. Multiple reused-label screens informed choice. Private improvement and rank unknown.",
+  "membership_preserved_every_row": true,
+  "mean_screen_passed": true,
+  "full_lower_95_positive": false,
+  "validation_provisional": false,
+  "model_component_weights": [
+    0.125,
+    0.125
+  ],
+  "baseline_weight": 0.75,
+  "submission_id": 56354034,
+  "public_score": 0.93876,
+  "status": "accepted public best",
+  "private_improvement_confirmed": false
+}

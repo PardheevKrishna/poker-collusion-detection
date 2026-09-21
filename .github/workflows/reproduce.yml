@@ -1,0 +1,23 @@
+name: Verify selected submissions
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Generate and verify v51 and v53
+        run: python scripts/reproduce.py --artifact-dir artifacts --output-dir outputs
+      - name: Show integrity report
+        run: cat outputs/reproduction_report.json
+

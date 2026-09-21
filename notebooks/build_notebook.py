@@ -276,25 +276,25 @@ def build() -> None:
 
             The next code cell is the complete compact clean-room implementation, copied from `src/poker_coordination/raw_pipeline.py` in the public repository. It reads only observable `hands`, `seats`, `actions`, and released development labels/evidence. It constructs one row per pair-hand, aggregates symmetric pair features, fits risk/behavior/event models, ranks five evidence hands, and returns a submission dataframe. Player identifiers are used only for joins and connected-pool boundaries; they are not model inputs.
 
-            Set `RUN_REFERENCE_REFIT = True` below when the raw competition data is mounted. The default is `False` so the notebook runs quickly in artifact-only mode. The fresh compact refit is a transparent reference implementation; byte-identical selected files are produced by the exact replay section below because the historical run also used large cached cross-fitting and ranking artifacts.
+            The notebook is attached to the competition source, so this path runs by default when Kaggle provides the raw tables. It performs preprocessing, pair-hand feature generation, weak evidence labeling, risk/behavior/event training, evidence inference, and bounded-batch submission writing. The fresh fit is intentionally retained as a visible candidate. The selected v51/v53 bytes are produced in the next section from the audited historical production deltas, because the original run used retained cross-fitting/checkpoint artifacts that are not contained in the raw tables.
             """
         ),
         code(raw_source),
         code(
             """
-            RUN_REFERENCE_REFIT = False
+            RUN_REFERENCE_REFIT = data_root is not None
             if RUN_REFERENCE_REFIT:
                 if data_root is None:
                     raise FileNotFoundError(
                         'Mount the competition raw data (or place it in ../data) before enabling the fresh refit.'
                     )
-                fresh = run_reference_refit(data_root)
+                fresh = run_reference_refit(data_root, eval_batch_size=2500)
                 fresh_path = Path('/kaggle/working' if Path('/kaggle/working').exists() else 'outputs') / 'reference_fresh_submission.csv'
                 write_submission(fresh, fresh_path)
                 print('Fresh reference submission:', fresh_path, fresh.shape)
                 display(fresh.head())
             else:
-                print('Fresh raw refit is disabled. Set RUN_REFERENCE_REFIT=True after mounting raw competition data.')
+                print('Raw competition data is not mounted; exact artifact mode remains available.')
             """
         ),
         md(
@@ -329,7 +329,7 @@ def build() -> None:
             """
             ## Exact selected-file generation
 
-            This is the authoritative reproduction route and the notebook's required output contract. One run writes `/kaggle/working/submission_v51.csv` and `/kaggle/working/submission_v53.csv` (or `outputs/` outside Kaggle), preserves CSV row order and untouched columns, and checks both selected SHA-256 values. It applies compact, deterministic patches to a frozen v50 base; no third-party package is needed for this section.
+            This is the authoritative selected-submission route and the notebook's required output contract. One run writes `/kaggle/working/submission_v51.csv` and `/kaggle/working/submission_v53.csv` (or `outputs/` outside Kaggle), preserves CSV row order and untouched columns, and checks both selected SHA-256 values. It applies the audited historical v51/v53 deltas to the v50 production baseline. The raw-data fit above is still executed and saved for audit; the exact selected assembly is separate so a fresh fit cannot silently be presented as byte-identical historical training.
             """
         ),
         code(
@@ -426,6 +426,33 @@ def build() -> None:
             display(report)
             for path, _ in outputs.values():
                 display(FileLink(str(path), result_html_prefix='Download generated file: '))
+            """
+        ),
+        md(
+            """
+            ### Raw-fit versus selected integrity
+
+            This comparison is deliberately visible. A fresh fit on the released tables is a new candidate, so it is expected to differ from the historical selected bytes. The selected files below are the exact audited production outputs; their hashes are the acceptance test.
+            """
+        ),
+        code(
+            """
+            if 'fresh' in globals():
+                raw_compare = []
+                for version, (path, _) in outputs.items():
+                    selected = pd.read_csv(path, dtype=str, keep_default_na=False)
+                    raw = fresh.copy()
+                    raw['risk_score'] = raw['risk_score'].map(lambda value: repr(float(value)))
+                    raw = raw.astype(str)
+                    raw_compare.append({
+                        'selected': version,
+                        'raw_rows': len(raw),
+                        'selected_rows': len(selected),
+                        'matching_cells': int((raw[FIELDS] == selected[FIELDS]).to_numpy().sum()),
+                        'total_cells': int(raw[FIELDS].size),
+                        'selected_sha256': digest(path),
+                    })
+                display(pd.DataFrame(raw_compare))
             """
         ),
         md(

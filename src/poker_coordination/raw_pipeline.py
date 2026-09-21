@@ -78,7 +78,8 @@ def connected_pool_groups(pairs: pd.DataFrame) -> np.ndarray:
     return np.asarray([root_to_group[find(str(left))] for left in pairs["player_1"]], dtype=np.int32)
 
 
-def build_pair_hand_features(data_root: str | Path, pairs: pd.DataFrame, max_pairs: int | None = None) -> pd.DataFrame:
+def build_pair_hand_features(data_root: str | Path, pairs: pd.DataFrame, max_pairs: int | None = None,
+                             seats_table=None, action_summary=None) -> pd.DataFrame:
     """Join both players to shared hands and aggregate their action context.
 
     The result has one row per ``pair_id, hand_id``. Joins are on gameplay
@@ -94,7 +95,8 @@ def build_pair_hand_features(data_root: str | Path, pairs: pd.DataFrame, max_pai
         "hand_id", "player_id", "total_contribution", "net_chips",
         "folded", "went_to_showdown", "won_share",
     ]
-    seats = pl.scan_parquet(str(root / "seats.parquet")).select(seat_cols)
+    seats = (seats_table.lazy() if seats_table is not None
+             else pl.scan_parquet(str(root / "seats.parquet"))).select(seat_cols)
     left = (
         seats.join(pair_keys, left_on="player_id", right_on="player_1", how="inner")
         .select(["pair_id", "hand_id", *[c for c in seat_cols if c not in ("hand_id", "player_id")]])
@@ -113,24 +115,10 @@ def build_pair_hand_features(data_root: str | Path, pairs: pd.DataFrame, max_pai
     hand_ids = shared.select("hand_id").unique().collect().get_column("hand_id").to_list()
 
     actions = (
-        pl.scan_parquet(str(root / "actions.parquet"))
+        (action_summary.lazy() if action_summary is not None
+         else pl.scan_parquet(str(root / "actions.parquet")))
         .filter(pl.col("hand_id").is_in(hand_ids))
-        .select(["hand_id", "player_id", "action", "amount"])
-        .with_columns(
-            [
-                (pl.col("action") == "raise").cast(pl.Int16).alias("raises"),
-                (pl.col("action") == "bet").cast(pl.Int16).alias("bets"),
-                (pl.col("action") == "call").cast(pl.Int16).alias("calls"),
-                (pl.col("action") == "fold").cast(pl.Int16).alias("folds"),
-            ]
-        )
-        .group_by(["hand_id", "player_id"])
-        .agg(
-            [
-                pl.sum("raises"), pl.sum("bets"), pl.sum("calls"), pl.sum("folds"),
-                pl.len().alias("action_count"), pl.sum("amount").alias("action_amount"),
-            ]
-        )
+        .select(["hand_id", "player_id", "raises", "bets", "calls", "folds", "action_count", "action_amount"])
     )
     action_names = ["raises", "bets", "calls", "folds", "action_count", "action_amount"]
     left_action = actions.rename({"player_id": "left_player_id", **{c: f"left_{c}" for c in action_names}})
@@ -239,19 +227,67 @@ def add_evidence_labels(events: pd.DataFrame, evidence: pd.DataFrame) -> pd.Data
     return result
 
 
-def run_reference_refit(data_root: str | Path, max_train_pairs: int | None = None,
-                        max_eval_pairs: int | None = None) -> pd.DataFrame:
-    """Run the complete compact refit from raw logs to a fresh CSV dataframe."""
+def aggregate_action_table(data_root: str | Path):
+    """Pre-aggregate observable actions once for bounded pair-batch joins."""
+    pl = _polars()
     root = Path(data_root)
+    return (
+        pl.scan_parquet(str(root / "actions.parquet"))
+        .select(["hand_id", "player_id", "action", "amount"])
+        .with_columns([
+            (pl.col("action") == "raise").cast(pl.Int16).alias("raises"),
+            (pl.col("action") == "bet").cast(pl.Int16).alias("bets"),
+            (pl.col("action") == "call").cast(pl.Int16).alias("calls"),
+            (pl.col("action") == "fold").cast(pl.Int16).alias("folds"),
+        ])
+        .group_by(["hand_id", "player_id"])
+        .agg([
+            pl.sum("raises"), pl.sum("bets"), pl.sum("calls"), pl.sum("folds"),
+            pl.len().alias("action_count"), pl.sum("amount").alias("action_amount"),
+        ])
+        .collect()
+    )
+
+
+def run_reference_refit(data_root: str | Path, max_train_pairs: int | None = None,
+                        max_eval_pairs: int | None = None,
+                        eval_batch_size: int = 2500) -> pd.DataFrame:
+    """Run the complete compact refit from raw logs to a fresh CSV dataframe.
+
+    Evaluation pairs are processed in bounded batches so the complete raw
+    path does not need to materialize every shared hand in memory at once.
+    """
+    if eval_batch_size <= 0:
+        raise ValueError("eval_batch_size must be positive")
+    root = Path(data_root)
+    pl = _polars()
     train = pd.read_csv(root / "development_labels.csv")
     evidence = pd.read_csv(root / "development_evidence.csv")
     evaluation = pd.read_csv(root / "evaluation_pairs.csv")
-    train_events = build_pair_hand_features(root, train, max_train_pairs)
+    seat_table = pl.read_parquet(root / "seats.parquet", columns=[
+        "hand_id", "player_id", "total_contribution", "net_chips",
+        "folded", "went_to_showdown", "won_share",
+    ])
+    action_summary = aggregate_action_table(root)
+    train_events = build_pair_hand_features(root, train, max_train_pairs,
+                                            seats_table=seat_table,
+                                            action_summary=action_summary)
     train_events = add_evidence_labels(train_events, evidence)
     models = fit_models(train.head(max_train_pairs) if max_train_pairs else train, train_events)
     eval_subset = evaluation.head(max_eval_pairs) if max_eval_pairs else evaluation
-    eval_events = build_pair_hand_features(root, eval_subset, max_eval_pairs)
-    return infer_submission(models, eval_subset, eval_events)
+    chunks = []
+    for start in range(0, len(eval_subset), eval_batch_size):
+        stop = min(start + eval_batch_size, len(eval_subset))
+        pair_chunk = eval_subset.iloc[start:stop].copy()
+        event_chunk = build_pair_hand_features(root, pair_chunk,
+                                               seats_table=seat_table,
+                                               action_summary=action_summary)
+        chunks.append(infer_submission(models, pair_chunk, event_chunk))
+    if not chunks:
+        return pd.DataFrame(columns=["pair_id", "risk_score", "predicted_behavior",
+                                     "evidence_hand_1", "evidence_hand_2", "evidence_hand_3",
+                                     "evidence_hand_4", "evidence_hand_5"])
+    return pd.concat(chunks, ignore_index=True)
 
 
 def write_submission(submission: pd.DataFrame, output_path: str | Path) -> Path:

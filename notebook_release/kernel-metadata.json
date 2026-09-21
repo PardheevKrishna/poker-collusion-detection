@@ -9,5 +9,8 @@
   "enable_internet": false,
   "dataset_sources": [
     "pardheev/poker-selected-submission-reproduction"
+  ],
+  "competition_sources": [
+    "detect-suspicious-value-transfers-in-poker"
   ]
 }

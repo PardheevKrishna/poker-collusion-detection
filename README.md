@@ -49,6 +49,12 @@ The historical research path generated about 19 GB of intermediate arrays during
 
 For a fresh compact refit from raw competition tables, run `run_reference_refit` from [`src/poker_coordination/raw_pipeline.py`](src/poker_coordination/raw_pipeline.py) after placing the raw files in `../data` (or mounting them in a notebook). It performs feature generation, weak evidence labeling, pair risk/behavior training, hand evidence scoring, stable top-five selection, and CSV validation in bounded evaluation batches. The Kaggle notebook runs this raw path when the competition source is mounted, saves `reference_fresh_submission.csv`, and then separately assembles the byte-identical selected files from the audited v50/v51/v53 production deltas. A fresh compact refit is intentionally not claimed to be byte-identical: the historical selected run depends on retained cross-fitting and ranking checkpoints that are documented in `historical_pipeline/`.
 
+To run that raw path locally:
+
+```bash
+python -c "from src.poker_coordination.raw_pipeline import run_reference_refit, write_submission; p=run_reference_refit('../data'); write_submission(p, 'outputs/reference_fresh_submission.csv')"
+```
+
 ## Repository map
 
 | Path | Purpose |
